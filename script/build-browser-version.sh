@@ -45,7 +45,7 @@ em++                                    \
   -s EXPORT_ALL=1 \
   -s MODULARIZE=1 \
   -O1                                   \
-  -o browser.js                         \
+  -o ../browser.js                         \
   -s LINKABLE=1 -s EXPORT_ALL=1 \
   -I ../src/bindings/em                    \
   -I ../src/core                           \
