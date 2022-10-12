@@ -127,5 +127,5 @@ function normalizeEncoding(encoding) {
     .replace(/^(SHIFT)(\w)/, '$1_$2')
 }
 
-exps.binding = ret
+exps.superstring = ret
 module.exports = exps;

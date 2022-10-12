@@ -6,9 +6,14 @@ const {
   traverse, traversalDistance, compare, format: formatPoint
 } = require('./helpers/point-helpers')
 
-const {Patch} = require('../..')
+let Patch
+const {superstring} = require('../..')
 
 describe('Patch', function () {
+  before(async () => {
+    const b = await superstring;
+    Patch = b.Patch;
+  })
   it('honors the mergeAdjacentChanges option set to false', function () {
     const patch = new Patch({mergeAdjacentChanges: false})
 
