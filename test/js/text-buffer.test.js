@@ -870,18 +870,18 @@ describe('TextBuffer', () => {
     })
   })
 
-  // describe('.baseTextDigest', () => {
-  //   it('returns a hash of the base text', () => {
-  //     const buffer = new TextBuffer('abc\r\ndefg\n\r\nhijkl')
-  //     const digest1 = buffer.baseTextDigest()
-  //
-  //     buffer.setTextInRange(Range(Point(0, 0), Point(0, 1)), 'A')
-  //     assert.equal(buffer.baseTextDigest(), digest1)
-  //
-  //     const buffer2 = new TextBuffer('abc\r\ndefg\n\r\nhijkl')
-  //     assert.equal(buffer2.baseTextDigest(), digest1)
-  //   })
-  // })
+  describe('.baseTextDigest', () => {
+    it('returns a hash of the base text', () => {
+      const buffer = new TextBuffer('abc\r\ndefg\n\r\nhijkl')
+      const digest1 = buffer.baseTextDigest()
+
+      buffer.setTextInRange(Range(Point(0, 0), Point(0, 1)), 'A')
+      assert.equal(buffer.baseTextDigest(), digest1)
+
+      const buffer2 = new TextBuffer('abc\r\ndefg\n\r\nhijkl')
+      assert.equal(buffer2.baseTextDigest(), digest1)
+    })
+  })
 
   // describe('.serializeChanges and .deserializeChanges', () => {
   //   it('allows the outstanding changes to be serialized and restored', () => {
@@ -1430,31 +1430,31 @@ describe('TextBuffer', () => {
   describe('concurrent IO', function () {
     this.timeout(60 * 1000);
 
-    // it('handles multiple calls to .load at a time', () => {
-    //   const buffer = new TextBuffer('abc')
-    //
-    //   const emptyFilePath = temp.openSync('atom').path
-    //   const smallFilePath = temp.openSync('atom').path
-    //   const largeFilePath = temp.openSync('atom').path
-    //   const smallContent = '123456789\n'.repeat(1024)
-    //   const largeContent = smallContent.repeat(10)
-    //   fs.writeFileSync(smallFilePath, smallContent)
-    //   fs.writeFileSync(largeFilePath, largeContent)
-    //
-    //   const load1 = buffer.load(emptyFilePath).then(() => {
-    //     assert.equal(buffer.getLength(), 0)
-    //   })
-    //
-    //   const load2 = buffer.load(smallFilePath).then(() => {
-    //     assert.equal(buffer.getLength(), smallContent.length)
-    //   })
-    //
-    //   const load3 = buffer.load(largeFilePath).then(() => {
-    //     assert.equal(buffer.getLength(), largeContent.length)
-    //   })
-    //
-    //   return Promise.all([load1, load2, load3])
-    // })
+    it('handles multiple calls to .load at a time', () => {
+      const buffer = new TextBuffer('abc')
+
+      const emptyFilePath = temp.openSync('atom').path
+      const smallFilePath = temp.openSync('atom').path
+      const largeFilePath = temp.openSync('atom').path
+      const smallContent = '123456789\n'.repeat(1024)
+      const largeContent = smallContent.repeat(10)
+      fs.writeFileSync(smallFilePath, smallContent)
+      fs.writeFileSync(largeFilePath, largeContent)
+
+      const load1 = buffer.load(emptyFilePath).then(() => {
+        assert.equal(buffer.getLength(), 0)
+      })
+
+      const load2 = buffer.load(smallFilePath).then(() => {
+        assert.equal(buffer.getLength(), smallContent.length)
+      })
+
+      const load3 = buffer.load(largeFilePath).then(() => {
+        assert.equal(buffer.getLength(), largeContent.length)
+      })
+
+      return Promise.all([load1, load2, load3])
+    })
 
     // it('handles random concurrent IO calls', () => {
     //   const generateSeed = Random.create()
@@ -1502,14 +1502,14 @@ describe('TextBuffer', () => {
     //       }
     //
     //       case 2: {
-    //         // const {start, deletedExtent, insertedText} = testDocument.performRandomSplice()
-    //         // buffer.setTextInRange(Range(start, traverse(start, deletedExtent)), insertedText)
-    //         // const text = buffer.getText()
-    //         // const filePath = temp.openSync().path
-    //         // currentText = text
-    //         // promises.push(buffer.save(filePath).then(() => {
-    //         //   assert.equal(fs.readFileSync(filePath, 'utf8'), text)
-    //         // }))
+    //         const {start, deletedExtent, insertedText} = testDocument.performRandomSplice()
+    //         buffer.setTextInRange(Range(start, traverse(start, deletedExtent)), insertedText)
+    //         const text = buffer.getText()
+    //         const filePath = temp.openSync().path
+    //         currentText = text
+    //         promises.push(buffer.save(filePath).then(() => {
+    //           assert.equal(fs.readFileSync(filePath, 'utf8'), text)
+    //         }))
     //         break;
     //       }
     //
