@@ -883,20 +883,20 @@ describe('TextBuffer', () => {
     })
   })
 
-  // describe('.serializeChanges and .deserializeChanges', () => {
-  //   it('allows the outstanding changes to be serialized and restored', () => {
-  //     const buffer = new TextBuffer('abc')
-  //     buffer.setTextInRange(Range(Point(0, 0), Point(0, 0)), '\n')
-  //     buffer.setTextInRange(Range(Point(1, 3), Point(1, 3)), 'D')
-  //     assert.equal(buffer.getText(), '\nabcD')
-  //
-  //     const changes = buffer.serializeChanges()
-  //     const buffer2 = new TextBuffer('123')
-  //     assert.equal(buffer2.getText(), '123')
-  //     buffer2.deserializeChanges(changes)
-  //     assert.equal(buffer2.getText(), '\n123D')
-  //   })
-  // })
+  describe('.serializeChanges and .deserializeChanges', () => {
+    it('allows the outstanding changes to be serialized and restored', () => {
+      const buffer = new TextBuffer('abc')
+      buffer.setTextInRange(Range(Point(0, 0), Point(0, 0)), '\n')
+      buffer.setTextInRange(Range(Point(1, 3), Point(1, 3)), 'D')
+      assert.equal(buffer.getText(), '\nabcD')
+
+      const changes = buffer.serializeChanges()
+      const buffer2 = new TextBuffer('123')
+      assert.equal(buffer2.getText(), '123')
+      buffer2.deserializeChanges(changes)
+      assert.equal(buffer2.getText(), '\n123D')
+    })
+  })
 
   describe('.find (sync and async)', () => {
     it('returns the range of the first match with the given pattern', async () => {
