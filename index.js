@@ -1,6 +1,8 @@
 let binding, exps = {};
 
 const fun = require('./browser');
+const fs = require('fs')
+const fsAsync = fs.promises
 
 const ret = fun().then(binding => {
   const {TextBuffer, Patch} = binding;
@@ -9,6 +11,17 @@ const ret = fun().then(binding => {
   exps.MarkerIndex = binding.MarkerIndex;
   const {findSync, findAllSync, findAndMarkAllSync, findWordsWithSubsequenceInRange, getCharacterAtPosition} = TextBuffer.prototype
   const DEFAULT_RANGE = Object.freeze({start: {row: 0, column: 0}, end: {row: Infinity, column: Infinity}})
+
+  TextBuffer.prototype.load = async function (fileName, options) {
+    this._encoding = options && options.encoding || "UTF-8";
+    const contents = await fsAsync.readFile(fileName, {encoding: this._encoding});
+    this.reset(contents);
+    return true;
+  }
+
+  TextBuffer.prototype.save = function (fileName) {
+    fsAsync.writeFile(fileName, this.getText(), {encoding: this._encoding});
+  }
 
   TextBuffer.prototype.findInRangeSync = function (pattern, range) {
     let ignoreCase = false
