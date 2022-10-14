@@ -20,7 +20,9 @@ const ret = fun().then(binding => {
   }
 
   TextBuffer.prototype.save = function (fileName) {
-    fsAsync.writeFile(fileName, this.getText(), {encoding: this._encoding});
+    const txt = this.getText();
+    this.reset(txt);
+    fsAsync.writeFile(fileName, txt, {encoding: this._encoding});
   }
 
   TextBuffer.prototype.findInRangeSync = function (pattern, range) {
