@@ -5,15 +5,8 @@
   "main": "./index",
   "browser": "./browser",
   "scripts": {
-    "build:node": "node-gyp rebuild",
-    "build:browser": "script/build-browser-version.sh",
-    "build": "npm run build:node && npm run build:browser",
-    "test:native": "node ./script/test-native.js",
-    "test:node": "mocha test/js/*.js",
-    "test:browser": "SUPERSTRING_USE_BROWSER_VERSION=1 mocha test/js/*.js",
-    "test": "npm run test:node && npm run test:browser",
+    "test": "mocha test/js/*.js",
     "benchmark": "node benchmark/marker-index.benchmark.js",
-    "prepublishOnly": "git submodule update --init --recursive && npm run build:browser",
     "standard": "standard --recursive src test"
   },
   "repository": {
@@ -30,9 +23,7 @@
     "url": "https://github.com/atom/superstring/issues"
   },
   "homepage": "https://github.com/atom/superstring",
-  "dependencies": {
-    "nan": "^2.14.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "chai": "^2.0.0",
     "mocha": "^2.3.4",

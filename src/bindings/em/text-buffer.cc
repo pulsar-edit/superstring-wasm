@@ -2,6 +2,8 @@
 #include "text-buffer.h"
 #include "marker-index.h"
 #include <emscripten/bind.h>
+#include <sstream>
+#include <iomanip>
 
 using std::string;
 using std::u16string;
@@ -48,6 +50,32 @@ static emscripten::val find_and_mark_all_sync(TextBuffer &buffer, MarkerIndex &i
   }
 
   return emscripten::val(buffer.find_and_mark_all(index, next_id, exclusive, regex, range));
+}
+
+static emscripten::val base_text_digest(TextBuffer &buffer) {
+  std::stringstream stream;
+  stream <<
+    std::setfill('0') <<
+    std::setw(16) <<
+    std::hex <<
+    buffer.base_text().digest();
+  return emscripten::val(stream.str());
+}
+
+static emscripten::val serialize_changes(TextBuffer &text_buffer) {
+  static std::vector<uint8_t> output;
+  output.clear();
+  Serializer serializer(output);
+  text_buffer.serialize_changes(serializer);
+  return emscripten::val(emscripten::typed_memory_view(output.size(), output.data()));
+}
+
+static emscripten::val deserialize_changes(TextBuffer &text_buffer, std::string data) {
+  static std::vector<uint8_t> input;
+  input.assign(data.c_str(), data.c_str() + data.size());
+  Deserializer deserializer(input);
+  text_buffer.deserialize_changes(deserializer);
+  return emscripten::val::null();
 }
 
 static emscripten::val line_ending_for_row(TextBuffer &buffer, uint32_t row) {
@@ -99,6 +127,9 @@ EMSCRIPTEN_BINDINGS(TextBuffer) {
     .function("findSync", find_sync)
     .function("findAllSync", find_all_sync)
     .function("findAndMarkAllSync", find_and_mark_all_sync)
+    .function("baseTextDigest", base_text_digest)
+    .function("serializeChanges", serialize_changes)
+    .function("deserializeChanges", deserialize_changes)
     .function("findWordsWithSubsequenceInRange", WRAP(&TextBuffer::find_words_with_subsequence_in_range));
 
   emscripten::value_object<TextBuffer::SubsequenceMatch>("SubsequenceMatch")

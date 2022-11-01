@@ -1,10 +1,15 @@
 const Random = require('random-seed')
 const {traverse, traversalDistance, compare, isZero, max, format: formatPoint} = require('./helpers/point-helpers')
 const {assert} = require('chai')
-const {MarkerIndex} = require('../..')
+let MarkerIndex;
+let {superstring} = require('../..')
 const MAX_INT32 = 4294967296
 
 describe('MarkerIndex', () => {
+  before(async () => {
+    const b = await superstring;
+    MarkerIndex = b.MarkerIndex;
+  })
   it('maintains correct marker positions during randomized insertions and mutations', function () {
     this.timeout(Infinity)
 
