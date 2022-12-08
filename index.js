@@ -9,7 +9,14 @@ const ret = fun().then(binding => {
   exps.TextBuffer = TextBuffer;
   exps.Patch = Patch;
   exps.MarkerIndex = binding.MarkerIndex;
-  const {findSync, findAllSync, findAndMarkAllSync, findWordsWithSubsequenceInRange, getCharacterAtPosition} = TextBuffer.prototype
+  const {
+    findSync,
+    findAllSync,
+    findAndMarkAllSync,
+    findWordsWithSubsequenceInRange,
+    getCharacterAtPosition,
+    serializeChanges
+  } = TextBuffer.prototype
   const DEFAULT_RANGE = Object.freeze({start: {row: 0, column: 0}, end: {row: Infinity, column: Infinity}})
 
   TextBuffer.prototype.load = async function (fileName, options) {
@@ -115,6 +122,10 @@ const ret = fun().then(binding => {
 
   TextBuffer.prototype.getCharacterAtPosition = function (position) {
     return String.fromCharCode(getCharacterAtPosition.call(this, position))
+  }
+
+  TextBuffer.prototype.serializeChanges = function () {
+    return Buffer.from(serializeChanges.call(this))
   }
 
   const {compose} = Patch
