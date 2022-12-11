@@ -22,8 +22,7 @@ const ret = fun().then(binding => {
   TextBuffer.prototype.load = async function (fileName, options) {
     this._encoding = options && options.encoding || "UTF-8";
     const contents = await fsAsync.readFile(fileName, {encoding: this._encoding});
-    this.reset(contents);
-    return true;
+    return this.reset(contents);
   }
 
   TextBuffer.prototype.save = function (fileName) {
