@@ -20,10 +20,12 @@ const ret = fun().then(binding => {
   const DEFAULT_RANGE = Object.freeze({start: {row: 0, column: 0}, end: {row: Infinity, column: Infinity}})
 
   TextBuffer.prototype.load = async function (fileName, options) {
-    if(this.isModified()) return;
-    this._encoding = options && options.encoding || "UTF-8";
+    const {encoding, patch, force} = options || {};
+    if(this.isModified() && !force) return;
+    this._encoding = encoding || "UTF-8";
     const contents = await fsAsync.readFile(fileName, {encoding: this._encoding});
-    return this.loadFromText(contents);
+
+    return this.loadFromText(contents, patch === undefined ? true : patch);
   }
 
   TextBuffer.prototype.save = function (fileName) {

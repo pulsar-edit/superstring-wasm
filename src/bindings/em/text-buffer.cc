@@ -106,7 +106,12 @@ static Point position_for_character_index(TextBuffer &buffer, long index) {
     buffer.position_for_offset(static_cast<uint32_t>(index));
 }
 
-static Patch load_from_text(TextBuffer &buffer, std::u16string file_contents) {
+static emscripten::val load_from_text(TextBuffer &buffer, std::u16string file_contents, bool calculate_patch) {
+  if(!calculate_patch) {
+    buffer.reset(file_contents);
+    return emscripten::val::null();
+  }
+
   auto snapshot = buffer.create_snapshot();
   auto contents = new Text(file_contents);
   auto patch = text_diff(snapshot->base_text(), file_contents);
@@ -125,7 +130,7 @@ static Patch load_from_text(TextBuffer &buffer, std::u16string file_contents) {
   } else {
     buffer.flush_changes();
   }
-  return patch;
+  return emscripten::val(std::move(patch));
 }
 
 EMSCRIPTEN_BINDINGS(TextBuffer) {
