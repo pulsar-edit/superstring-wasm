@@ -83,330 +83,287 @@ describe('TextBuffer', () => {
     MarkerIndex = b.MarkerIndex;
   })
 
-  // describe('.load', async () => {
-  //   it('can load from a file at a given path', () => {
-  //     const buffer = new TextBuffer()
-  //
-  //     const {path: filePath} = temp.openSync()
-  //     const content = 'a\nb\nc\n'.repeat(10 * 1024)
-  //     fs.writeFileSync(filePath, content)
-  //
-  //     const percentages = []
-  //     return buffer.load(filePath, (percentDone) => percentages.push(percentDone))
-  //       .then(() => {
-  //         assert.equal(buffer.getText(), content)
-  //         assert.deepEqual(percentages, percentages.map(Number).sort((a, b) => a - b))
-  //         assert(percentages[0] >= 0)
-  //         assert(percentages[percentages.length - 1] == 100)
-  //       })
-  //   })
-  //
-  //   it('can load from a given stream', () => {
-  //     const buffer = new TextBuffer()
-  //
-  //     const {path: filePath} = temp.openSync()
-  //     const fileContent = 'abc def ghi jkl\n'.repeat(10 * 1024)
-  //     fs.writeFileSync(filePath, fileContent)
-  //
-  //     const percentages = []
-  //     const stream = fs.createReadStream(filePath)
-  //     return buffer.load(stream, (percentage) => percentages.push(percentage))
-  //       .then(() => {
-  //         assert.equal(buffer.getText(), fileContent)
-  //         assert.deepEqual(percentages, percentages.map(Number).sort((a, b) => a - b))
-  //         assert(percentages[percentages.length - 1] == 100)
-  //       })
-  //   })
-  //
-  //   it('can load from a given stream with an encoding already set', () => {
-  //     const buffer = new TextBuffer()
-  //
-  //     const {path: filePath} = temp.openSync()
-  //     const fileContent = 'abc def ghi jkl\n'.repeat(1024)
-  //     fs.writeFileSync(filePath, fileContent)
-  //
-  //     const stream = fs.createReadStream(filePath, 'utf8')
-  //     return buffer.load(stream).then(() => {
-  //       assert.equal(buffer.getText(), fileContent)
-  //     })
-  //   })
-  //
-  //   it('resolves with a Patch representing the difference between the old and new text', () => {
-  //     const buffer = new TextBuffer('cat\ndog\nelephant\nfox')
-  //     const {path: filePath} = temp.openSync()
-  //     fs.writeFileSync(filePath, 'bug\ncat\ndog\nelephant\nfox\ngoat')
-  //
-  //     let progressCallbackPatch
-  //     return buffer.load(filePath, (percentDone, patch) => {
-  //       progressCallbackPatch = patch
-  //     }).then(patch => {
-  //
-  //       // The patch is also passed to the progress callback on the final call.
-  //       assert.equal(progressCallbackPatch, patch)
-  //
-  //       assert.deepEqual(toPlainObject(patch.getChanges()), [
-  //         {
-  //           oldStart: {row: 0, column: 0}, oldEnd: {row: 0, column: 0},
-  //           newStart: {row: 0, column: 0}, newEnd: {row: 1, column: 0},
-  //           oldText: '',
-  //           newText: 'bug\n'
-  //         },
-  //         {
-  //           oldStart: {row: 3, column: 3}, oldEnd: {row: 3, column: 3},
-  //           newStart: {row: 4, column: 3}, newEnd: {row: 5, column: 4},
-  //           oldText: '',
-  //           newText: '\ngoat'
-  //         }
-  //       ])
-  //     })
-  //   })
-  //
-  //   it('resolves with an empty patch when the contents of the file have not changed', () => {
-  //     const buffer = new TextBuffer('cat\ndog\nelephant\nfox')
-  //     const {path: filePath} = temp.openSync()
-  //     fs.writeFileSync(filePath, 'cat\ndog\nelephant\nfox')
-  //
-  //     return buffer.load(filePath).then(patch => {
-  //       assert.deepEqual(patch.getChanges(), [])
-  //       assert.equal(buffer.getText(), 'cat\ndog\nelephant\nfox')
-  //     })
-  //   })
-  //
-  //   it('can load a file in a non-UTF8 encoding', () => {
-  //     const buffer = new TextBuffer()
-  //
-  //     const {path: filePath} = temp.openSync()
-  //     const content = 'a\nb\nc\n'.repeat(10)
-  //     fs.writeFileSync(filePath, content, 'utf16le')
-  //
-  //     return buffer.load(filePath, {encoding: 'UTF-16LE'}).then(() =>
-  //       assert.equal(buffer.getText(), content)
-  //     )
-  //   })
-  //
-  //   it('rejects its promise if an invalid encoding is given', () => {
-  //     const buffer = new TextBuffer()
-  //
-  //     const {path: filePath} = temp.openSync()
-  //     const content = 'a\nb\nc\n'.repeat(10)
-  //     fs.writeFileSync(filePath, content, 'utf16le')
-  //
-  //     let rejection = null
-  //     return buffer.load(filePath, {encoding: 'GARBAGE16'})
-  //       .catch(error => rejection = error)
-  //       .then(() => assert.equal(rejection.message, 'Invalid encoding name: GARBAGE16'))
-  //   })
-  //
-  //   it('aborts if the buffer is modified before the load', () => {
-  //     const buffer = new TextBuffer('abc')
-  //     const {path: filePath} = temp.openSync()
-  //     fs.writeFileSync(filePath, 'def')
-  //
-  //     buffer.setText('ghi')
-  //
-  //     return buffer.load(filePath).then(result => {
-  //       assert.equal(result, null)
-  //       assert.equal(buffer.getText(), 'ghi')
-  //       assert.ok(buffer.isModified())
-  //     })
-  //   })
-  //
-  //   it('aborts if the buffer is modified during the load', () => {
-  //     const buffer = new TextBuffer('abc')
-  //     const {path: filePath} = temp.openSync()
-  //     fs.writeFileSync(filePath, 'def')
-  //
-  //     const loadPromise = buffer.load(filePath).then(result => {
-  //       assert.equal(result, null)
-  //       assert.equal(buffer.getText(), 'ghi')
-  //       assert.ok(buffer.isModified())
-  //     })
-  //
-  //     buffer.setText('ghi')
-  //     return loadPromise
-  //   })
-  //
-  //   it('aborts if the progress callback returns false during the load', () => {
-  //     const buffer = new TextBuffer('abc')
-  //     const filePath = temp.openSync().path
-  //     fs.writeFileSync(filePath, '123456789\n'.repeat(100))
-  //
-  //     let progressCount = 0
-  //     function progressCallback() {
-  //       progressCount++
-  //       return false
-  //     }
-  //
-  //     return buffer.load(filePath, progressCallback).then((patch) => {
-  //       assert.notOk(patch)
-  //       assert.equal(progressCount, 1)
-  //       assert.equal(buffer.getText(), 'abc')
-  //       assert.notOk(buffer.isModified())
-  //     })
-  //   })
-  //
-  //   it('aborts if the final progress callback returns false', () => {
-  //     const buffer = new TextBuffer('abc')
-  //     const filePath = temp.openSync().path
-  //
-  //     function progressCallback(percentDone, patch) {
-  //       if (patch) return false
-  //     }
-  //
-  //     return buffer.load(filePath, progressCallback).then((patch) => {
-  //       assert.notOk(patch)
-  //       assert.equal(buffer.getText(), 'abc')
-  //       assert.notOk(buffer.isModified())
-  //     })
-  //   })
-  //
-  //   it('can handle a variety of encodings', () => {
-  //     const filePath = temp.openSync().path
-  //     fs.writeFileSync(filePath, 'abc', 'ascii')
-  //
-  //     return Promise.all(encodings.map((encoding) =>
-  //       new TextBuffer().load(filePath, {encoding})
-  //     ))
-  //   })
-  //
-  //   // it('handles paths containing non-ascii characters', () => {
-  //   //   const directory = temp.mkdirSync()
-  //   //   const filePath = path.join(directory, 'русский.txt')
-  //   //   fs.writeFileSync(filePath, 'Hello')
-  //   //   const buffer = new TextBuffer()
-  //   //   return buffer.load(filePath).then(() => {
-  //   //     assert.equal(buffer.getText(), 'Hello')
-  //   //
-  //   //     buffer.setTextInRange(Range(Point(0, 5), Point(0, 5)), '!')
-  //   //     return buffer.save(filePath).then(() => {
-  //   //       assert.equal(fs.readFileSync(filePath), 'Hello!')
-  //   //     })
-  //   //   })
-  //   // })
-  //
-  //   describe('when the `force` option is set to true', () => {
-  //     it('discards any modifications and incorporates that change into the resolved patch', () => {
-  //       const buffer = new TextBuffer('abcdef')
-  //       const {path: filePath} = temp.openSync()
-  //       fs.writeFileSync(filePath, '  abcdef')
-  //
-  //       buffer.setTextInRange(Range(Point(0, 3), Point(0, 3)), ' ')
-  //       assert.equal(buffer.getText(), 'abc def')
-  //       assert.ok(buffer.isModified())
-  //
-  //       const loadPromise = buffer.load(filePath, {force: true}).then(patch => {
-  //         assert.equal(buffer.getText(), '  abcdef')
-  //         assert.notOk(buffer.isModified())
-  //         assert.deepEqual(toPlainObject(patch.getChanges()), [
-  //           {
-  //             oldStart: {row: 0, column: 0}, oldEnd: {row: 0, column: 0},
-  //             newStart: {row: 0, column: 0}, newEnd: {row: 0, column: 2},
-  //             oldText: '',
-  //             newText: '  '
-  //           },
-  //           {
-  //             oldStart: {row: 0, column: 3}, oldEnd: {row: 0, column: 4},
-  //             newStart: {row: 0, column: 5}, newEnd: {row: 0, column: 5},
-  //             oldText: ' ',
-  //             newText: ''
-  //           },
-  //           {
-  //             oldStart: {row: 0, column: 7}, oldEnd: {row: 0, column: 8},
-  //             newStart: {row: 0, column: 8}, newEnd: {row: 0, column: 8},
-  //             oldText: ' ',
-  //             newText: ''
-  //           }
-  //         ])
-  //       })
-  //
-  //       buffer.setTextInRange(Range(Point(0, 7), Point(0, 7)), ' ')
-  //       assert.equal(buffer.getText(), 'abc def ')
-  //       assert.ok(buffer.isModified())
-  //
-  //       return loadPromise
-  //     })
-  //
-  //     it('marks the buffer as unmodified even if the reload does not change the text', () => {
-  //       const buffer = new TextBuffer('abcdef')
-  //
-  //       const {path: filePath} = temp.openSync()
-  //       const fileContent = '  abcdef'
-  //       fs.writeFileSync(filePath, fileContent)
-  //
-  //       buffer.setTextInRange(Range(Point(0, 0), Point(0, 0)), '  ')
-  //       assert.ok(buffer.isModified())
-  //       assert.equal(buffer.getText(), fileContent)
-  //
-  //       return buffer.load(filePath, {force: true}).then(patch => {
-  //         assert.equal(patch.getChanges(), 0)
-  //         assert.equal(buffer.getText(), '  abcdef')
-  //         assert.notOk(buffer.isModified())
-  //       })
-  //     })
-  //   })
-  //
-  //   describe('when the `patch` option is set to false', () => {
-  //     it('does not compute a Patch representing the changes', () => {
-  //       const buffer = new TextBuffer()
-  //
-  //       const filePath = temp.openSync().path
-  //       fs.writeFileSync(filePath, 'abc')
-  //
-  //       return buffer.load(filePath, {patch: false}).then((patch) => {
-  //         assert.equal(patch, null)
-  //         assert.equal(buffer.getText(), 'abc')
-  //
-  //         buffer.setTextInRange(Range(Point(0, 0), Point(0, 0)), '  ')
-  //         return buffer.load(filePath, {patch: false, force: true}).then((patch) => {
-  //           assert.equal(patch, null)
-  //           assert.equal(buffer.getText(), 'abc')
-  //         })
-  //       })
-  //     })
-  //   })
-  //
-  //   describe('error handling', () => {
-  //     it('rejects with an error if the path points to a directory', (done) => {
-  //       const buffer = new TextBuffer()
-  //       const filePath = temp.mkdirSync()
-  //
-  //       return buffer.load(filePath)
-  //         .then(() => {
-  //           done(new Error('Expected an error'))
-  //         })
-  //         .catch((error) => {
-  //           if (!isWindows) {
-  //             assert.include(error.message, ' read ')
-  //             assert.equal(error.code, 'EISDIR')
-  //           }
-  //           assert.equal(error.path, filePath)
-  //           done()
-  //         })
-  //     })
-  //
-  //     it('rejects with an error if the path is a circular symlink', (done) => {
-  //       const tempDir = temp.mkdirSync()
-  //       const filePath = path.join(tempDir, 'one')
-  //       const otherPath = path.join(tempDir, 'two')
-  //       fs.symlinkSync(filePath, otherPath)
-  //       fs.symlinkSync(otherPath, filePath)
-  //
-  //       const buffer = new TextBuffer()
-  //       return buffer.load(filePath)
-  //         .then(() => {
-  //           done(new Error('Expected an error'))
-  //         })
-  //         .catch((error) => {
-  //           if (!isWindows) {
-  //             assert.include(error.message, ' open ')
-  //             assert.equal(error.code, 'ELOOP')
-  //           }
-  //           assert.equal(error.path, filePath)
-  //           done()
-  //         })
-  //     })
-  //   })
-  // })
+  describe('.load', async () => {
+    it('can load from a file at a given path', () => {
+      const buffer = new TextBuffer()
+
+      const {path: filePath} = temp.openSync()
+      const content = 'a\nb\nc\n'.repeat(10 * 1024)
+      fs.writeFileSync(filePath, content)
+
+      return buffer.load(filePath).then(() => { assert.equal(buffer.getText(), content) })
+    })
+
+    it('resolves with a Patch representing the difference between the old and new text', () => {
+      const buffer = new TextBuffer('cat\ndog\nelephant\nfox')
+      const {path: filePath} = temp.openSync()
+      fs.writeFileSync(filePath, 'bug\ncat\ndog\nelephant\nfox\ngoat')
+
+      let progressCallbackPatch
+      return buffer.load(filePath).then(patch => {
+        assert.deepEqual(toPlainObject(patch.getChanges()), [
+          {
+            oldStart: {row: 0, column: 0}, oldEnd: {row: 0, column: 0},
+            newStart: {row: 0, column: 0}, newEnd: {row: 1, column: 0},
+            oldText: '',
+            newText: 'bug\n'
+          },
+          {
+            oldStart: {row: 3, column: 3}, oldEnd: {row: 3, column: 3},
+            newStart: {row: 4, column: 3}, newEnd: {row: 5, column: 4},
+            oldText: '',
+            newText: '\ngoat'
+          }
+        ])
+      })
+    })
+
+    it('resolves with an empty patch when the contents of the file have not changed', () => {
+      const buffer = new TextBuffer('cat\ndog\nelephant\nfox')
+      const {path: filePath} = temp.openSync()
+      fs.writeFileSync(filePath, 'cat\ndog\nelephant\nfox')
+
+      return buffer.load(filePath).then(patch => {
+        assert.deepEqual(patch.getChanges(), [])
+        assert.equal(buffer.getText(), 'cat\ndog\nelephant\nfox')
+      })
+    })
+
+    it('can load a file in a non-UTF8 encoding', () => {
+      const buffer = new TextBuffer()
+
+      const {path: filePath} = temp.openSync()
+      const content = 'a\nb\nc\n'.repeat(10)
+      fs.writeFileSync(filePath, content, 'utf16le')
+
+      return buffer.load(filePath, {encoding: 'UTF-16LE'}).then(() =>
+        assert.equal(buffer.getText(), content)
+      )
+    })
+
+    it('rejects its promise if an invalid encoding is given', () => {
+      const buffer = new TextBuffer()
+
+      const {path: filePath} = temp.openSync()
+      const content = 'a\nb\nc\n'.repeat(10)
+      fs.writeFileSync(filePath, content, 'utf16le')
+
+      let rejection = null
+      return buffer.load(filePath, {encoding: 'GARBAGE16'})
+        .catch(error => rejection = error)
+        .then(() => assert.equal(rejection.message, 'The value "GARBAGE16" is invalid for option "encoding'))
+    })
+
+    it('aborts if the buffer is modified before the load', () => {
+      const buffer = new TextBuffer('abc')
+      const {path: filePath} = temp.openSync()
+      fs.writeFileSync(filePath, 'def')
+
+      buffer.setText('ghi')
+
+      return buffer.load(filePath).then(result => {
+        assert.equal(result, null)
+        assert.equal(buffer.getText(), 'ghi')
+        assert.ok(buffer.isModified())
+      })
+    })
+    //
+    // it('aborts if the buffer is modified during the load', () => {
+    //   const buffer = new TextBuffer('abc')
+    //   const {path: filePath} = temp.openSync()
+    //   fs.writeFileSync(filePath, 'def')
+    //
+    //   const loadPromise = buffer.load(filePath).then(result => {
+    //     assert.equal(result, null)
+    //     assert.equal(buffer.getText(), 'ghi')
+    //     assert.ok(buffer.isModified())
+    //   })
+    //
+    //   buffer.setText('ghi')
+    //   return loadPromise
+    // })
+    //
+    // it('aborts if the progress callback returns false during the load', () => {
+    //   const buffer = new TextBuffer('abc')
+    //   const filePath = temp.openSync().path
+    //   fs.writeFileSync(filePath, '123456789\n'.repeat(100))
+    //
+    //   let progressCount = 0
+    //   function progressCallback() {
+    //     progressCount++
+    //     return false
+    //   }
+    //
+    //   return buffer.load(filePath, progressCallback).then((patch) => {
+    //     assert.notOk(patch)
+    //     assert.equal(progressCount, 1)
+    //     assert.equal(buffer.getText(), 'abc')
+    //     assert.notOk(buffer.isModified())
+    //   })
+    // })
+    //
+    // it('aborts if the final progress callback returns false', () => {
+    //   const buffer = new TextBuffer('abc')
+    //   const filePath = temp.openSync().path
+    //
+    //   function progressCallback(percentDone, patch) {
+    //     if (patch) return false
+    //   }
+    //
+    //   return buffer.load(filePath, progressCallback).then((patch) => {
+    //     assert.notOk(patch)
+    //     assert.equal(buffer.getText(), 'abc')
+    //     assert.notOk(buffer.isModified())
+    //   })
+    // })
+    //
+    // it('can handle a variety of encodings', () => {
+    //   const filePath = temp.openSync().path
+    //   fs.writeFileSync(filePath, 'abc', 'ascii')
+    //
+    //   return Promise.all(encodings.map((encoding) =>
+    //     new TextBuffer().load(filePath, {encoding})
+    //   ))
+    // })
+    //
+    // // it('handles paths containing non-ascii characters', () => {
+    // //   const directory = temp.mkdirSync()
+    // //   const filePath = path.join(directory, 'русский.txt')
+    // //   fs.writeFileSync(filePath, 'Hello')
+    // //   const buffer = new TextBuffer()
+    // //   return buffer.load(filePath).then(() => {
+    // //     assert.equal(buffer.getText(), 'Hello')
+    // //
+    // //     buffer.setTextInRange(Range(Point(0, 5), Point(0, 5)), '!')
+    // //     return buffer.save(filePath).then(() => {
+    // //       assert.equal(fs.readFileSync(filePath), 'Hello!')
+    // //     })
+    // //   })
+    // // })
+    //
+    // describe('when the `force` option is set to true', () => {
+    //   it('discards any modifications and incorporates that change into the resolved patch', () => {
+    //     const buffer = new TextBuffer('abcdef')
+    //     const {path: filePath} = temp.openSync()
+    //     fs.writeFileSync(filePath, '  abcdef')
+    //
+    //     buffer.setTextInRange(Range(Point(0, 3), Point(0, 3)), ' ')
+    //     assert.equal(buffer.getText(), 'abc def')
+    //     assert.ok(buffer.isModified())
+    //
+    //     const loadPromise = buffer.load(filePath, {force: true}).then(patch => {
+    //       assert.equal(buffer.getText(), '  abcdef')
+    //       assert.notOk(buffer.isModified())
+    //       assert.deepEqual(toPlainObject(patch.getChanges()), [
+    //         {
+    //           oldStart: {row: 0, column: 0}, oldEnd: {row: 0, column: 0},
+    //           newStart: {row: 0, column: 0}, newEnd: {row: 0, column: 2},
+    //           oldText: '',
+    //           newText: '  '
+    //         },
+    //         {
+    //           oldStart: {row: 0, column: 3}, oldEnd: {row: 0, column: 4},
+    //           newStart: {row: 0, column: 5}, newEnd: {row: 0, column: 5},
+    //           oldText: ' ',
+    //           newText: ''
+    //         },
+    //         {
+    //           oldStart: {row: 0, column: 7}, oldEnd: {row: 0, column: 8},
+    //           newStart: {row: 0, column: 8}, newEnd: {row: 0, column: 8},
+    //           oldText: ' ',
+    //           newText: ''
+    //         }
+    //       ])
+    //     })
+    //
+    //     buffer.setTextInRange(Range(Point(0, 7), Point(0, 7)), ' ')
+    //     assert.equal(buffer.getText(), 'abc def ')
+    //     assert.ok(buffer.isModified())
+    //
+    //     return loadPromise
+    //   })
+    //
+    //   it('marks the buffer as unmodified even if the reload does not change the text', () => {
+    //     const buffer = new TextBuffer('abcdef')
+    //
+    //     const {path: filePath} = temp.openSync()
+    //     const fileContent = '  abcdef'
+    //     fs.writeFileSync(filePath, fileContent)
+    //
+    //     buffer.setTextInRange(Range(Point(0, 0), Point(0, 0)), '  ')
+    //     assert.ok(buffer.isModified())
+    //     assert.equal(buffer.getText(), fileContent)
+    //
+    //     return buffer.load(filePath, {force: true}).then(patch => {
+    //       assert.equal(patch.getChanges(), 0)
+    //       assert.equal(buffer.getText(), '  abcdef')
+    //       assert.notOk(buffer.isModified())
+    //     })
+    //   })
+    // })
+    //
+    // // describe('when the `patch` option is set to false', () => {
+    // //   it('does not compute a Patch representing the changes', () => {
+    // //     const buffer = new TextBuffer()
+    // //
+    // //     const filePath = temp.openSync().path
+    // //     fs.writeFileSync(filePath, 'abc')
+    // //
+    // //     return buffer.load(filePath, {patch: false}).then((patch) => {
+    // //       assert.equal(patch, null)
+    // //       assert.equal(buffer.getText(), 'abc')
+    // //
+    // //       buffer.setTextInRange(Range(Point(0, 0), Point(0, 0)), '  ')
+    // //       return buffer.load(filePath, {patch: false, force: true}).then((patch) => {
+    // //         assert.equal(patch, null)
+    // //         assert.equal(buffer.getText(), 'abc')
+    // //       })
+    // //     })
+    // //   })
+    // // })
+    //
+    // // describe('error handling', () => {
+    // //   it('rejects with an error if the path points to a directory', (done) => {
+    // //     const buffer = new TextBuffer()
+    // //     const filePath = temp.mkdirSync()
+    // //
+    // //     return buffer.load(filePath)
+    // //       .then(() => {
+    // //         done(new Error('Expected an error'))
+    // //       })
+    // //       .catch((error) => {
+    // //         if (!isWindows) {
+    // //           assert.include(error.message, ' read ')
+    // //           assert.equal(error.code, 'EISDIR')
+    // //         }
+    // //         assert.equal(error.path, filePath)
+    // //         done()
+    // //       })
+    // //   })
+    // //
+    // //   it('rejects with an error if the path is a circular symlink', (done) => {
+    // //     const tempDir = temp.mkdirSync()
+    // //     const filePath = path.join(tempDir, 'one')
+    // //     const otherPath = path.join(tempDir, 'two')
+    // //     fs.symlinkSync(filePath, otherPath)
+    // //     fs.symlinkSync(otherPath, filePath)
+    // //
+    // //     const buffer = new TextBuffer()
+    // //     return buffer.load(filePath)
+    // //       .then(() => {
+    // //         done(new Error('Expected an error'))
+    // //       })
+    // //       .catch((error) => {
+    // //         if (!isWindows) {
+    // //           assert.include(error.message, ' open ')
+    // //           assert.equal(error.code, 'ELOOP')
+    // //         }
+    // //         assert.equal(error.path, filePath)
+    // //         done()
+    // //       })
+    // //   })
+    // // })
+  })
 
   // describe('.baseTextMatchesFile', () => {
   //   it('indicates whether the base text matches the contents of the given file path', () => {
