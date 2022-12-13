@@ -5,7 +5,7 @@ mkdir -p build
 cd build
 
 emcc                                         \
-  -O1                                        \
+  -O3                                        \
   -I ../vendor/pcre/10.23/src                   \
   -I ../vendor/pcre/include                     \
   -D HAVE_CONFIG_H                           \
@@ -44,7 +44,7 @@ em++                                    \
   -s EXTRA_EXPORTED_RUNTIME_METHODS="['ccall','cwrap']" \
   -s EXPORT_ALL=1 \
   -s MODULARIZE=1 \
-  -O1                                   \
+  -O3                                   \
   -o ../browser.js                         \
   -s LINKABLE=1 -s EXPORT_ALL=1 \
   -I ../src/bindings/em                    \
