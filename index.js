@@ -28,10 +28,10 @@ const ret = fun().then(binding => {
     return this.loadFromText(contents, patch === undefined ? true : patch);
   }
 
-  TextBuffer.prototype.save = function (fileName) {
+  TextBuffer.prototype.save = async function (fileName) {
     const txt = this.getText();
     this.reset(txt);
-    fsAsync.writeFile(fileName, txt, {encoding: this._encoding});
+    await fsAsync.writeFile(fileName, txt, {encoding: this._encoding});
   }
 
   TextBuffer.prototype.findInRangeSync = function (pattern, range) {
