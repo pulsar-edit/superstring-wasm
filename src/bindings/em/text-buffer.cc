@@ -1,5 +1,7 @@
 #include "auto-wrap.h"
+#include "text.h"
 #include "text-buffer.h"
+#include "text-diff.h"
 #include "marker-index.h"
 #include <emscripten/bind.h>
 #include <sstream>
@@ -104,6 +106,33 @@ static Point position_for_character_index(TextBuffer &buffer, long index) {
     buffer.position_for_offset(static_cast<uint32_t>(index));
 }
 
+static emscripten::val load_from_text(TextBuffer &buffer, std::u16string file_contents, bool calculate_patch) {
+  if(!calculate_patch) {
+    buffer.reset(file_contents);
+    return emscripten::val::null();
+  }
+
+  auto snapshot = buffer.create_snapshot();
+  auto contents = new Text(file_contents);
+  auto patch = text_diff(snapshot->base_text(), file_contents);
+
+  Patch inverted_changes = buffer.get_inverted_changes(snapshot);
+  delete snapshot;
+
+  if (inverted_changes.get_change_count() > 0) {
+    inverted_changes.combine(patch);
+    patch = std::move(inverted_changes);
+  }
+
+  bool has_changed = patch.get_change_count() > 0;;
+  if (has_changed) {
+    buffer.reset(file_contents);
+  } else {
+    buffer.flush_changes();
+  }
+  return emscripten::val(std::move(patch));
+}
+
 EMSCRIPTEN_BINDINGS(TextBuffer) {
   emscripten::class_<TextBuffer>("TextBuffer")
     .constructor<>()
@@ -130,6 +159,7 @@ EMSCRIPTEN_BINDINGS(TextBuffer) {
     .function("baseTextDigest", base_text_digest)
     .function("serializeChanges", serialize_changes)
     .function("deserializeChanges", deserialize_changes)
+    .function("loadFromText", load_from_text)
     .function("findWordsWithSubsequenceInRange", WRAP(&TextBuffer::find_words_with_subsequence_in_range));
 
   emscripten::value_object<TextBuffer::SubsequenceMatch>("SubsequenceMatch")

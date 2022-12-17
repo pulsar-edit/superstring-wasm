@@ -6,3 +6,8 @@ build
 /browser.js
 emsdk-portable
 package-lock.json
+Makefile
+*.cmake
+compile_commands.json
+CMakeCache.txt
+CMakeFiles

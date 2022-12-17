@@ -6,7 +6,6 @@
 #include <ostream>
 #include <cassert>
 
-using std::move;
 using std::ostream;
 using std::vector;
 
